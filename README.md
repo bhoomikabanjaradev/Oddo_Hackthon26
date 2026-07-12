@@ -1,650 +1,74 @@
-# 🚚 TransitOps - Smart Transport Operations Platform
+# TransitOps : Smart Transport Operations Platform
 
-> Hackathon MVP | Deadline: **5:00 PM**
->
-> **Goal:** Build a working transport management system that demonstrates the complete operational workflow. We are **NOT** building a production-ready SaaS. We are building a polished MVP that judges can demo in under 5 minutes.
+**A smarter way to run a transport fleet.**
 
----
+Built during Oddo Hackathon 2026, TransitOps replaces the spreadsheets and paper logbooks a lot of logistics teams still rely on. One place to register vehicles and drivers, dispatch trips, keep maintenance on schedule, and track fuel costs — with the system enforcing the rules instead of hoping someone remembers them.
 
-# 👥 Team
+## Why we built this
 
-| Member | Responsibility |
-|----------|---------------|
-| Bhoomika (Leader) 
-| Ankit | 
-| Bipin |
-| Priya | 
----
+Ask anyone running a small fleet how they track which truck is available, whether a driver's license is still valid, or what a vehicle actually cost last month in fuel and repairs — you'll usually get a shrug and an Excel sheet. Things fall through the cracks: a driver gets dispatched with an expired license, a vehicle goes out overloaded, maintenance gets forgotten until something breaks. TransitOps doesn't let that happen — the rules are baked into the backend, not left up to memory.
 
-# 🎯 MVP Goal
+## Who it's for
 
-The judge should be able to do this:
+Fleet managers tracking vehicle status, dispatchers assigning trips, safety officers watching license expiries, and finance teams tracking what the fleet actually costs.
 
+## What it does
+
+- **Login & auth** — nobody gets in without credentials
+- **Dashboard** — a quick read on vehicles, drivers, and active trips
+- **Vehicles** — register, edit, retire; unique registration number, capacity, live status
+- **Drivers** — same idea, plus license tracking so expired ones can't be dispatched
+- **Trips** — create, dispatch, complete — capacity, availability, and license get checked before dispatch is allowed
+- **Maintenance** — flag a vehicle for service and it's pulled out of the dispatch pool until closed
+- **Fuel logs** — a running record of what each vehicle's burning through
+
+## The rules that actually matter
+
+- Registration numbers must be unique
+- A vehicle already on a trip or in the shop can't be dispatched again
+- A driver with an expired license, or already on a trip, is off the table
+- Cargo can't exceed what the vehicle's rated to carry
+- Dispatch → vehicle and driver both flip to "On Trip," automatically
+- Complete → they both flip back to "Available," automatically
+- Send to maintenance → vehicle disappears from dispatch until the ticket's closed
+
+## Built with
+
+**Backend:** Node.js, Express, MongoDB, Mongoose, JWT, bcrypt, Zod
+**Frontend:** React, Vite, Tailwind CSS, React Router, Axios
+
+## API, briefly
+
+- **Auth** — `POST /api/v1/auth/login` to sign in, `GET /api/v1/auth/me` to check who's logged in
+- **Vehicles** — `GET /api/v1/vehicles` to list them, `POST` to add one, `GET/PATCH/DELETE /api/v1/vehicles/:id` to view, edit, or remove a specific one
+- **Drivers** — same pattern, under `/api/v1/drivers`
+- **Trips** — `GET/POST /api/v1/trips` to list or create, then `PATCH /api/v1/trips/:id/dispatch` and `PATCH /api/v1/trips/:id/complete` to move a trip through its lifecycle
+- **Maintenance** — `GET/POST /api/v1/maintenance` to log or view records, `PATCH /api/v1/maintenance/:id/close` when the vehicle's back in service
+- **Fuel logs** — `GET/POST /api/v1/fuel` to record or pull up fuel entries
+
+## Running it yourself
+
+**Backend**
+```bash
+cd backend
+npm install
+```
+Add a `.env` file in `backend/`:
+```
+MONGODB_URI=mongodb://localhost:27017/transitops
+PORT=3000
+```
+```bash
+node src/server.js
 ```
 
-Login
-↓
-Dashboard
-↓
-Add Vehicle
-↓
-Add Driver
-↓
-Create Trip
-↓
-Dispatch Trip
-↓
-Complete Trip
-↓
-Vehicle becomes Available again
-↓
-Driver becomes Available again
-
+**Frontend**
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
-If this works smoothly,
-**we have a complete MVP.**
+## A quick walkthrough
 
----
-
-# ❌ Ignore Until MVP is Finished
-
-- PDF Export
-- Email Notifications
-- Charts
-- Dark Mode
-- Advanced Analytics
-- Search
-- Filters
-- Revenue Calculations
-- Fancy Dashboard
-
-These are only if time remains.
-
----
-
-# ✅ MVP Features (Non-Negotiable)
-
-## 1. Authentication
-
-- Login
-- JWT Authentication
-- Protected Routes
-
-*(Signup can be skipped by seeding one admin user.)*
-
----
-
-## 2. Dashboard
-
-Display only:
-
-- Total Vehicles
-- Available Vehicles
-- Active Trips
-- Drivers
-- Vehicles In Maintenance
-
-Simple cards are enough.
-
----
-
-## 3. Vehicle Management
-
-### CRUD
-
-- Add Vehicle
-- View Vehicles
-- Update Vehicle
-- Delete Vehicle
-
-Fields
-
-- Registration Number
-- Vehicle Name
-- Vehicle Type
-- Capacity
-- Odometer
-- Status
-
-Status
-
-```
-
-Available
-On Trip
-In Shop
-
-```
-
----
-
-## 4. Driver Management
-
-CRUD
-
-Fields
-
-- Name
-- License Number
-- License Expiry
-- Status
-
-Status
-
-```
-
-Available
-On Trip
-Suspended
-
-```
-
----
-
-## 5. Trip Management ⭐⭐⭐
-
-This is the core feature.
-
-User can
-
-- Create Trip
-- Dispatch Trip
-- Complete Trip
-
-Business Rules
-
-✔ Vehicle must be Available
-
-✔ Driver must be Available
-
-✔ License must not be expired
-
-✔ Cargo <= Vehicle Capacity
-
-Dispatch
-
-```
-
-Vehicle → On Trip
-Driver → On Trip
-
-```
-
-Complete
-
-```
-
-Vehicle → Available
-Driver → Available
-
-```
-
----
-
-## 6. Maintenance
-
-Only
-
-Create Maintenance
-
-Automatically
-
-```
-
-Vehicle
-↓
-
-In Shop
-
-```
-
-Close Maintenance
-
-```
-
-Vehicle
-↓
-
-Available
-
-```
-
----
-
-## 7. Fuel Logs
-
-Simple
-
-- Vehicle
-- Liters
-- Cost
-
----
-
-# 🛠 Backend Stack
-
-- Node.js
-- Express
-- MongoDB
-- Mongoose
-- JWT
-- bcrypt
-- Zod
-
----
-
-# 📁 Folder Structure
-
-```
-
-backend/
-
-src/
-
-config/
-controllers/
-middleware/
-models/
-routes/
-services/
-utils/
-validations/
-
-app.js
-server.js
-
-```
-
----
-
-# 📦 MongoDB Collections
-
-```
-
-users
-
-vehicles
-
-drivers
-
-trips
-
-maintenances
-
-fuelLogs
-
-```
-
----
-
-# 📌 API List
-
-## Auth
-
-```
-
-POST /login
-
-GET /me
-
-```
-
----
-
-## Vehicles
-
-```
-
-GET /vehicles
-
-POST /vehicles
-
-PATCH /vehicles/:id
-
-DELETE /vehicles/:id
-
-```
-
----
-
-## Drivers
-
-```
-
-GET /drivers
-
-POST /drivers
-
-PATCH /drivers/:id
-
-DELETE /drivers/:id
-
-```
-
----
-
-## Trips
-
-```
-
-POST /trips
-
-PATCH /trips/:id/dispatch
-
-PATCH /trips/:id/complete
-
-GET /trips
-
-```
-
----
-
-## Maintenance
-
-```
-
-POST /maintenance
-
-PATCH /maintenance/:id/close
-
-GET /maintenance
-
-```
-
----
-
-## Fuel
-
-```
-
-POST /fuel
-
-GET /fuel
-
-```
-
----
-
-## Dashboard
-
-```
-
-GET /dashboard
-
-```
-
-Returns
-
-```json
-{
-  "vehicles": 12,
-  "availableVehicles": 8,
-  "drivers": 7,
-  "activeTrips": 3,
-  "maintenance": 1
-}
-```
-
----
-
-# ⚙️ Backend TODO 
-## Phase 1 (10:00 - 10:45)
-
-- [ ] Initialize Backend
-- [ ] Install Packages
-- [ ] Connect MongoDB
-- [ ] Create Folder Structure
-- [ ] Setup Express Server
-
----
-
-## Phase 2 (10:45 - 11:30)
-
-- [ ] User Model
-- [ ] Vehicle Model
-- [ ] Driver Model
-- [ ] Trip Model
-- [ ] Maintenance Model
-- [ ] FuelLog Model
-
----
-
-## Phase 3 (11:30 - 12:15)
-
-- [ ] JWT Login
-- [ ] Auth Middleware
-
----
-
-## Phase 4 (12:15 - 1:15)
-
-- [ ] Vehicle CRUD
-- [ ] Test in Postman
-
----
-
-## Phase 5 (1:15 - 2:00)
-
-- [ ] Dashboard Counts API
-
----
-
-# ⚙️ Backend TODO 
-
-## Phase 1
-
-- [ ] Driver CRUD
-
----
-
-## Phase 2
-
-- [ ] Create Trip
-
----
-
-## Phase 3
-
-- [ ] Dispatch Trip
-
-Checks
-
-- Vehicle Available
-- Driver Available
-- License Valid
-- Capacity Check
-
----
-
-## Phase 4
-
-- [ ] Complete Trip
-
-Updates
-
-Vehicle
-
-```
-
-On Trip
-↓
-
-Available
-
-```
-
-Driver
-
-```
-
-On Trip
-↓
-
-Available
-
-```
-
----
-
-## Phase 5
-
-- [ ] Maintenance API
-
-Vehicle
-
-```
-
-Available
-↓
-
-In Shop
-
-```
-
----
-
-## Phase 6
-
-- [ ] Fuel Logs API
-
----
-
-# 🎨 Frontend TODO 
-
-## Setup
-
-- [ ] React + Tailwind
-- [ ] Routing
-- [ ] Sidebar
-- [ ] Navbar
-
----
-
-## Pages
-
-- [ ] Login
-- [ ] Dashboard
-- [ ] Vehicles
-- [ ] Drivers
-- [ ] Trips
-- [ ] Maintenance
-
----
-
-## Integration
-
-- [ ] Login API
-- [ ] Vehicle APIs
-- [ ] Driver APIs
-- [ ] Trip APIs
-- [ ] Dashboard API
-
----
-
-# ⏰ Timeline
-
-## 10:00 → 10:30
-
-- Repo Setup
-- Branches
-- Backend Initialization
-- React Setup
-
----
-
-## 10:30 → 12:00
-
-Backend
-
-- Auth
-- Models
-- Vehicle CRUD
-- Driver CRUD
-
-Frontend
-
-- Login
-- Dashboard
-- Sidebar
-
----
-
-## 12:00 → 2:00
-
-Trip Management
-
-Maintenance
-
-Fuel
-
-Dashboard API
-
-Frontend Integration
-
----
-
-## 2:00 → 3:30
-
-Connect Everything
-
-Fix Bugs
-
-Test Complete Workflow
-
----
-
-## 3:30 → 5:00
-
-## Polish
-
-- Better UI
-- Loading States
-- Toasts
-- Responsive Design
-- Seed Demo Data
-- Demo Practice
-- Final Testing
-
----
-
-# 🏆 Demo Flow
-
-1. Login
-2. Dashboard
-3. Add Vehicle
-4. Add Driver
-5. Create Trip
-6. Dispatch Trip
-7. Show Vehicle = On Trip
-8. Show Driver = On Trip
-9. Complete Trip
-10. Show Vehicle = Available
-11. Create Maintenance
-12. Vehicle becomes In Shop
-13. Dashboard Updates
-
----
-
-# 🚨 Rules (Most Important)
-
-- Registration Number must be unique.
-- Cargo Weight cannot exceed Vehicle Capacity.
-- Vehicle already On Trip cannot be assigned.
-- Driver already On Trip cannot be assigned.
-- Expired License cannot be assigned.
-- Dispatch automatically changes statuses.
-- Complete automatically restores statuses.
-- Maintenance automatically sets Vehicle to In Shop.
-
----
-
-# 🎯 Success Criteria
-
-If the judge can complete the following workflow without any errors:
-
-Login → Dashboard → Add Vehicle → Add Driver → Create Trip → Dispatch → Complete → Maintenance
-
-**We consider the MVP complete.**
-
-Everything after this is polishing.
+Register a vehicle, register a driver, create a trip between them. Try to dispatch it — the system checks everything's in order first. Once it's out, both the vehicle and driver show as busy. Mark the trip complete, and they're free again. Send the vehicle to maintenance, and it quietly steps out of the lineup until you bring it back. That's the whole loop — the same one a real dispatcher runs in their head, just enforced instead of hoped for.
