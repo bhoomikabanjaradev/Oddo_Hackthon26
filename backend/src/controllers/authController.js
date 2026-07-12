@@ -23,7 +23,7 @@ const createToken = (user) => {
     role: user.role,
   };
 
-  return jwt.sign(payload, process.env.JWT_SECRET || "default_jwt_secret", {
+  return jwt.sign(payload, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 };
