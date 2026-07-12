@@ -4,6 +4,13 @@
 
 @layer base {
   body {
-    @apply bg-[#f8fafc] text-slate-900 antialiased font-sans;
+    @apply bg-slate-50 text-slate-900 antialiased font-sans;
   }
+}
+
+/* Custom smooth transition grid helper for judges demo */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
 }
