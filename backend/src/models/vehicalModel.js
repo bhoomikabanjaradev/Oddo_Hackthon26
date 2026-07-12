@@ -1,4 +1,4 @@
-import mongoosem, { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const vehicleSchema = new Schema(
   {
