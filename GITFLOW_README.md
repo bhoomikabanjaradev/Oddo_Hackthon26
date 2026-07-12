@@ -8,10 +8,10 @@ This repository follows a simple Git workflow so that everyone can work in paral
 
 # 👥 Team Members
 
-- 👨‍💻 Ankit - Backend
-- 👩‍💻 Bhoomika - Team Lead / Integration
-- 👩‍💻 Priya - Frontend
-- 👨‍💻 Bipin - Maps / Realtime / Deployment
+- 👩‍💻 Bhoomika - Team Lead
+- 👨‍💻 Ankit - 
+- 👩‍💻 Priya - 
+- 👨‍💻 Bipin - 
 
 ---
 
@@ -348,4 +348,4 @@ git merge main
 
 Build a working MVP within the hackathon time while keeping the repository clean, organized, and conflict-free.
 
-Happy Coding! 🚀
+
