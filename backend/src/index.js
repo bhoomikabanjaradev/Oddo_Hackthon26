@@ -1,6 +1,10 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { connectDB } from "./config/db.js";
+import vehicleRoutes from "./routes/vehicleRoutes.js";
+
+dotenv.config();
 
 dotenv.config();
 import routes from "./routes/index.js";
