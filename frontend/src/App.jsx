@@ -1,31 +1,63 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import ProtectedRoute from './components/ProtectedRoute.jsx';
+import Sidebar from './components/Sidebar.jsx';
+import Navbar from './components/Navbar.jsx'; //  Navbar ko import 
+
+// Core Dashboard Pages Allocation
 import Login from './pages/Login.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Vehicles from './pages/Vehicles.jsx';
 import Drivers from './pages/Drivers.jsx';
 import Trips from './pages/Trips.jsx';
 import Maintenance from './pages/Maintenance.jsx';
-import Sidebar from './components/Sidebar.jsx';
-import Navbar from './components/Navbar.jsx';
 
 export default function App() {
-  // Demo check window: Isko false rakhoge toh pehle login page dikhega.
-  const [isAuthenticated, setIsAuthenticated] = useState(false); 
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    // Check if token already exists from a previous active session
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsAuthenticated(true);
+    }
+    setChecking(false);
+  }, []);
+
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center font-mono text-sm tracking-wider">
+        Initializing Control Protocols...
+      </div>
+    );
+  }
 
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
-        <Route
-          path="/*"
-          element={
-            isAuthenticated ? (
-              <div className="flex h-screen bg-gray-100 overflow-hidden">
-                <Sidebar />
-                <div className="flex-1 flex flex-col overflow-hidden">
-                  <Navbar setIsAuthenticated={setIsAuthenticated} />
-                  <main className="flex-1 overflow-x-hidden overflow-y-auto p-6">
+        {/* Public Routes Terminal */}
+        <Route 
+          path="/login" 
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login setIsAuthenticated={setIsAuthenticated} />} 
+        />
+
+        {/* Protected System Wrapper */}
+        <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
+          <Route
+            path="/*"
+            element={
+              <div className="flex bg-slate-50 min-h-screen">
+                {/* Fixed Control Panel Navigation Sidebar */}
+                <Sidebar setIsAuthenticated={setIsAuthenticated} />
+                
+                {/* Dynamic Content Operations Workspace */}
+                <main className="flex-1 ml-64 overflow-y-auto bg-slate-50 flex flex-col min-h-screen">
+                  {/* 👈 2. EXACT YAHAN PAR NAVBAR RAKHA HAI */}
+                  <Navbar /> 
+                  
+                  {/* Pages Padding Wrapper */}
+                  <div className="p-8 flex-1">
                     <Routes>
                       <Route path="/dashboard" element={<Dashboard />} />
                       <Route path="/vehicles" element={<Vehicles />} />
@@ -34,15 +66,13 @@ export default function App() {
                       <Route path="/maintenance" element={<Maintenance />} />
                       <Route path="*" element={<Navigate to="/dashboard" replace />} />
                     </Routes>
-                  </main>
-                </div>
+                  </div>
+                </main>
               </div>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
+            }
+          />
+        </Route>
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
