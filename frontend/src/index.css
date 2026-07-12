@@ -18,44 +18,42 @@
   --shadow-floating: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
 }
 
-@layer base {
-  body {
-    @apply bg-slate-50 text-slate-900 antialiased font-sans selection:bg-brand-200 selection:text-brand-900;
-  }
+/* Base Styles */
+@utility body {
+  @apply bg-slate-50 text-slate-900 antialiased font-sans selection:bg-brand-200 selection:text-brand-900;
 }
 
-@layer utilities {
-  .glass-panel {
-    @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-soft;
-  }
-  
-  .input-field {
-    @apply w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all duration-200;
-  }
-  
-  .btn-primary {
-    @apply flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-xl text-sm transition-all duration-200 shadow-sm shadow-brand-500/20 active:scale-[0.98];
-  }
-  
-  .btn-secondary {
-    @apply flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-medium rounded-xl text-sm transition-all duration-200 shadow-sm active:scale-[0.98];
-  }
+/* Custom Components / Utilities */
+@utility glass-panel {
+  @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-soft;
+}
 
-  .status-badge {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border;
-  }
-  
-  .status-available {
-    @apply bg-emerald-50 text-emerald-700 border-emerald-200/50;
-  }
-  
-  .status-ontrip {
-    @apply bg-amber-50 text-amber-700 border-amber-200/50;
-  }
-  
-  .status-inshop {
-    @apply bg-rose-50 text-rose-700 border-rose-200/50;
-  }
+@utility input-field {
+  @apply w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all duration-200;
+}
+
+@utility btn-primary {
+  @apply flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-xl text-sm transition-all duration-200 shadow-sm shadow-brand-500/20 active:scale-[0.98];
+}
+
+@utility btn-secondary {
+  @apply flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-medium rounded-xl text-sm transition-all duration-200 shadow-sm active:scale-[0.98];
+}
+
+@utility status-badge {
+  @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border;
+}
+
+@utility status-available {
+  @apply bg-emerald-50 text-emerald-700 border-emerald-200/50;
+}
+
+@utility status-ontrip {
+  @apply bg-amber-50 text-amber-700 border-amber-200/50;
+}
+
+@utility status-inshop {
+  @apply bg-rose-50 text-rose-700 border-rose-200/50;
 }
 
 /* Custom smooth transition grid helper for judges demo */
