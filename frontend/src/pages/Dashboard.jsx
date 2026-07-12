@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Truck, Users, MapPin, AlertCircle, ShieldAlert } from 'lucide-react';
+import { Truck, Users, MapPin, AlertCircle, ShieldCheck, ArrowUpRight } from 'lucide-react';
 import api from '../utils/api.js';
 
 export default function Dashboard() {
@@ -16,40 +16,63 @@ export default function Dashboard() {
   }, []);
 
   const stats = [
-    { label: 'Total Assets', value: metrics.vehicles, color: 'bg-blue-500', text: 'text-blue-600', icon: Truck },
-    { label: 'Available Trucks', value: metrics.availableVehicles, color: 'bg-emerald-500', text: 'text-emerald-600', icon: Truck },
-    { label: 'Total Drivers', value: metrics.drivers, color: 'bg-indigo-500', text: 'text-indigo-600', icon: Users },
-    { label: 'Active Trips', value: metrics.activeTrips, color: 'bg-sky-500', text: 'text-sky-600', icon: MapPin },
-    { label: 'In Workshop', value: metrics.maintenance, color: 'bg-amber-500', text: 'text-amber-600', icon: AlertCircle },
+    { label: 'Total Fleet', value: metrics.vehicles, color: 'text-brand-600', bg: 'bg-brand-50', border: 'border-brand-100', icon: Truck },
+    { label: 'Available Units', value: metrics.availableVehicles, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100', icon: Truck },
+    { label: 'Active Drivers', value: metrics.drivers, color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-100', icon: Users },
+    { label: 'Trips in Transit', value: metrics.activeTrips, color: 'text-sky-600', bg: 'bg-sky-50', border: 'border-sky-100', icon: MapPin },
+    { label: 'Maintenance Bay', value: metrics.maintenance, color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-100', icon: AlertCircle },
   ];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-bold text-slate-900">Dashboard Control Matrix</h1>
-        <p className="text-xs text-slate-500 mt-0.5">Live real-time operational sync.</p>
+    <div className="space-y-8 animate-in fade-in duration-300">
+      <div className="flex items-end justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Operations Overview</h1>
+          <p className="text-sm text-slate-500 mt-1">Real-time status of your transport fleet and active dispatch operations.</p>
+        </div>
+        <div className="bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 border border-emerald-200 shadow-sm">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          System Online
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
         {stats.map((stat, idx) => {
           const Icon = stat.icon;
           return (
-            <div key={idx} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-              <div>
-                <span className="text-[11px] font-medium text-slate-400 block">{stat.label}</span>
-                <span className="text-xl font-bold text-slate-800 tracking-tight">{loading ? '...' : stat.value}</span>
+            <div key={idx} className="glass-panel p-5 rounded-2xl flex flex-col justify-between group hover:shadow-floating transition-all duration-300 cursor-default">
+              <div className="flex justify-between items-start mb-4">
+                <div className={`p-2.5 rounded-xl ${stat.bg} ${stat.color} border ${stat.border}`}>
+                  <Icon size={20} />
+                </div>
+                <ArrowUpRight size={16} className="text-slate-300 group-hover:text-slate-400 transition-colors" />
               </div>
-              <div className={`p-2.5 ${stat.color}/10 rounded-lg ${stat.text}`}>
-                <Icon size={18} />
+              <div>
+                <span className="text-3xl font-bold text-slate-900 tracking-tight block mb-1">
+                  {loading ? (
+                    <div className="h-9 w-12 bg-slate-100 rounded animate-pulse"></div>
+                  ) : stat.value}
+                </span>
+                <span className="text-xs font-medium text-slate-500">{stat.label}</span>
               </div>
             </div>
           );
         })}
       </div>
       
-      <div className="bg-slate-900 text-white p-4 rounded-xl text-xs flex items-center gap-3">
-        <ShieldAlert className="text-emerald-400 shrink-0" size={16} />
-        <p><strong>System Status Matrix Online.</strong> Core database connections are active.</p>
+      <div className="bg-white border border-slate-200 p-5 rounded-2xl flex items-start gap-4 shadow-sm max-w-2xl">
+        <div className="mt-0.5 bg-emerald-100 text-emerald-600 p-2 rounded-lg">
+          <ShieldCheck size={20} />
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-slate-900 mb-1">Data Matrix Synchronized</h3>
+          <p className="text-sm text-slate-500 leading-relaxed">
+            All core databases are connected. Vehicle telematics, driver rosters, and trip dispatches are running seamlessly.
+          </p>
+        </div>
       </div>
     </div>
   );

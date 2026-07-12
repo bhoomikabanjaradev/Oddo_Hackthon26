@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Play, CheckCircle, AlertCircle } from 'lucide-react';
+import { Plus, Play, CheckCircle, AlertCircle, MapPin, Truck, Search } from 'lucide-react';
 import api from '../utils/api.js';
 
 export default function Trips() {
@@ -40,47 +40,129 @@ export default function Trips() {
     refreshOptions();
   };
 
-  return (
-    <div className="space-y-6">
-      <div><h1 className="text-xl font-bold text-slate-900">Trip Dispatch Matrix</h1></div>
-      {error && <div className="bg-red-50 text-red-700 p-3 rounded-xl text-sm flex items-center gap-2"><AlertCircle size={16}/><span>{error}</span></div>}
+  const getStatusBadge = (status) => {
+    if (status === 'Created') return <span className="status-badge bg-slate-100 text-slate-700">Pending Dispatch</span>;
+    if (status === 'Dispatched') return <span className="status-badge status-ontrip">En Route</span>;
+    if (status === 'Completed') return <span className="status-badge status-available">Delivered</span>;
+    return <span className="status-badge bg-slate-100 text-slate-700">{status}</span>;
+  };
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="bg-white p-5 rounded-xl border shadow-sm h-fit">
-          <h2 className="text-sm font-semibold mb-3">Create Trip</h2>
-          <form onSubmit={handleCreateTrip} className="space-y-3">
-            <select value={selectedVehicle} onChange={e => setSelectedVehicle(e.target.value)} className="w-full px-3.5 py-2 bg-slate-50 border rounded-xl text-sm">
-              <option value="">-- Choose Vehicle --</option>
-              {vehicles.map(v => <option key={v._id} value={v._id}>{v.vehicleName}</option>)}
-            </select>
-            <select value={selectedDriver} onChange={e => setSelectedDriver(e.target.value)} className="w-full px-3.5 py-2 bg-slate-50 border rounded-xl text-sm">
-              <option value="">-- Choose Driver --</option>
-              {drivers.map(d => <option key={d._id} value={d._id}>{d.name}</option>)}
-            </select>
-            <input type="text" required placeholder="Route (e.g. Mum-Del)" value={route} onChange={e => setRoute(e.target.value)} className="w-full px-3.5 py-2 bg-slate-50 border rounded-xl text-sm" />
-            <input type="number" required placeholder="Cargo (Tons)" value={cargoWeight} onChange={e => setCargoWeight(e.target.value)} className="w-full px-3.5 py-2 bg-slate-50 border rounded-xl text-sm" />
-            <button type="submit" className="w-full py-2 bg-blue-600 text-white text-sm rounded-xl font-medium">Save Manifest</button>
+  return (
+    <div className="space-y-8 animate-in fade-in duration-300">
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Active Dispatches</h1>
+        <p className="text-sm text-slate-500 mt-1">Assign drivers to vehicles and manage trip lifecycles.</p>
+      </div>
+
+      {error && (
+        <div className="bg-rose-50 text-rose-700 p-4 rounded-xl text-sm flex items-center gap-3 border border-rose-100">
+          <AlertCircle size={18} />
+          <span className="font-medium">{error}</span>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="lg:col-span-4 glass-panel p-6 rounded-2xl h-fit">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-sky-50 text-sky-600 rounded-lg">
+              <Plus size={20} />
+            </div>
+            <h2 className="text-base font-bold text-slate-900">Create Manifest</h2>
+          </div>
+          <form onSubmit={handleCreateTrip} className="space-y-4">
+            <div>
+              <label className="text-xs font-semibold text-slate-600 block mb-1.5 ml-1">Available Vehicle</label>
+              <select value={selectedVehicle} onChange={e => setSelectedVehicle(e.target.value)} className="input-field">
+                <option value="">-- Select --</option>
+                {vehicles.map(v => <option key={v._id} value={v._id}>{v.registrationNumber} ({v.vehicleName})</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-slate-600 block mb-1.5 ml-1">Available Operator</label>
+              <select value={selectedDriver} onChange={e => setSelectedDriver(e.target.value)} className="input-field">
+                <option value="">-- Select --</option>
+                {drivers.map(d => <option key={d._id} value={d._id}>{d.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-slate-600 block mb-1.5 ml-1">Route Designation</label>
+              <input type="text" required placeholder="e.g. NY to BOS" value={route} onChange={e => setRoute(e.target.value)} className="input-field" />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-slate-600 block mb-1.5 ml-1">Cargo Load (Tons)</label>
+              <input type="number" required placeholder="20" value={cargoWeight} onChange={e => setCargoWeight(e.target.value)} className="input-field" />
+            </div>
+            <button type="submit" className="w-full py-2.5 px-4 bg-sky-600 hover:bg-sky-700 text-white font-medium rounded-xl text-sm transition-all duration-200 shadow-sm shadow-sky-500/20 active:scale-[0.98] mt-2">
+              Save Manifest
+            </button>
           </form>
         </div>
 
-        <div className="lg:col-span-2 bg-white rounded-xl border shadow-sm overflow-hidden">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-slate-400 text-xs border-b">
-              <tr><th className="px-6 py-3">Route Path</th><th className="px-6 py-3">Status</th><th className="px-6 py-3">Action Gate</th></tr>
-            </thead>
-            <tbody className="divide-y text-slate-700">
-              {trips.map(t => (
-                <tr key={t._id} className="hover:bg-slate-50">
-                  <td className="px-6 py-3 font-semibold">{t.route} <span className="block text-xs font-normal text-slate-400">{t.cargoWeight} Tons</span></td>
-                  <td className="px-6 py-3"><span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">{t.status}</span></td>
-                  <td className="px-6 py-3">
-                    {t.status === 'Created' && <button onClick={() => handleDispatch(t._id)} className="flex items-center gap-1 text-xs text-blue-600 font-semibold border px-2 py-1 rounded"><Play size={12}/> Dispatch</button>}
-                    {t.status === 'Dispatched' && <button onClick={() => handleComplete(t._id)} className="flex items-center gap-1 text-xs text-emerald-600 font-semibold border px-2 py-1 rounded"><CheckCircle size={12}/> Complete</button>}
-                  </td>
+        <div className="lg:col-span-8 glass-panel rounded-2xl overflow-hidden flex flex-col">
+          <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-white/50">
+            <h3 className="font-semibold text-slate-900">Trip Directory</h3>
+            <div className="relative">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input type="text" placeholder="Search routes..." className="pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs w-48 focus:outline-none focus:ring-2 focus:ring-sky-500/20" />
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm whitespace-nowrap">
+              <thead className="bg-slate-50/50 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-100">
+                <tr>
+                  <th className="px-6 py-4">Route Path</th>
+                  <th className="px-6 py-4">Assigned Assets</th>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4 text-right">Gate Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100 text-slate-700">
+                {trips.map(t => (
+                  <tr key={t._id} className="hover:bg-slate-50/80 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 group-hover:bg-sky-50 group-hover:text-sky-600 transition-colors">
+                          <MapPin size={14} />
+                        </div>
+                        <div>
+                          <span className="font-semibold text-slate-900 block">{t.route}</span>
+                          <span className="text-xs text-slate-500">{t.cargoWeight} Tons Cargo</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col gap-1">
+                         <span className="text-xs font-mono text-slate-600 flex items-center gap-1.5"><Truck size={12}/> {t.vehicle?.registrationNumber || 'Pending'}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">{getStatusBadge(t.status)}</td>
+                    <td className="px-6 py-4 text-right">
+                      {t.status === 'Created' && (
+                        <button onClick={() => handleDispatch(t._id)} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-brand-700 bg-brand-50 border border-brand-200 rounded-lg font-medium hover:bg-brand-100 transition-colors shadow-sm">
+                          <Play size={12}/> Dispatch
+                        </button>
+                      )}
+                      {t.status === 'Dispatched' && (
+                        <button onClick={() => handleComplete(t._id)} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg font-medium hover:bg-emerald-100 transition-colors shadow-sm">
+                          <CheckCircle size={12}/> Complete
+                        </button>
+                      )}
+                      {t.status === 'Completed' && (
+                        <span className="text-xs text-slate-400 font-medium px-3 py-1.5">Archived</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+                {trips.length === 0 && (
+                  <tr>
+                    <td colSpan="4" className="px-6 py-8 text-center text-slate-500 text-sm">
+                      No trips scheduled. Create a manifest to begin.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
