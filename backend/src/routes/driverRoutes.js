@@ -1,58 +1,46 @@
-import Driver from "../models/driverModel.js";
+import express from "express";
 
-export const createDriver = async (req, res) => {
-  try {
-    const driver = await Driver.create(req.body);
-    res.status(201).json(driver);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
+import {
+  createDriver,
+  getDrivers,
+  getDriverById,
+  updateDriver,
+  deleteDriver,
+} from "../controllers/driverController.js";
 
-export const getDrivers = async (req, res) => {
-  try {
-    const drivers = await Driver.find();
-    res.status(200).json(drivers);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+import authMiddleware from "../middleware/authMiddleware.js";
+import roleMiddleware from "../middleware/roleMiddleware.js";
 
-export const getDriverById = async (req, res) => {
-  try {
-    const driver = await Driver.findById(req.params.id);
-    if (!driver) {
-      return res.status(404).json({ message: "Driver not found" });
-    }
-    res.status(200).json(driver);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+const router = express.Router();
 
-export const updateDriver = async (req, res) => {
-  try {
-    const driver = await Driver.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    if (!driver) {
-      return res.status(404).json({ message: "Driver not found" });
-    }
-    res.status(200).json(driver);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
+// View Drivers (Admin & Manager)
+router.get("/", authMiddleware, roleMiddleware("admin", "manager"), getDrivers);
 
-export const deleteDriver = async (req, res) => {
-  try {
-    const driver = await Driver.findByIdAndDelete(req.params.id);
-    if (!driver) {
-      return res.status(404).json({ message: "Driver not found" });
-    }
-    res.status(200).json({ message: "Driver deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+// View Single Driver
+router.get(
+  "/:id",
+  authMiddleware,
+  roleMiddleware("admin", "manager"),
+  getDriverById,
+);
+
+// Create Driver
+router.post(
+  "/",
+  authMiddleware,
+  roleMiddleware("admin", "manager"),
+  createDriver,
+);
+
+// Update Driver
+router.patch(
+  "/:id",
+  authMiddleware,
+  roleMiddleware("admin", "manager"),
+  updateDriver,
+);
+
+// Delete Driver (Admin Only)
+router.delete("/:id", authMiddleware, roleMiddleware("admin"), deleteDriver);
+
+export default router;
